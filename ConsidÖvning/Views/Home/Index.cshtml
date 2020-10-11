@@ -1,0 +1,72 @@
+﻿@{
+	ViewBag.Title = "Home Page";
+}
+
+
+
+<div class="row" style="margin-top: 10vh;">
+	<div class=" cardClass col-md-4" onclick="linkItem()" style="background-image: url(../Content/Images/Library.png);">
+
+		<div class="textDivClass">
+			<h2>Library Items</h2>
+		</div>
+	</div>
+	<div class="cardClass col-md-4" onclick="linkCategory()" style="background-image: url(../Content/Images/categories.jpg);">
+
+		<div class="textDivClass">
+			<h2>Categories</h2>
+		</div>
+
+	</div>
+	<div class="cardClass col-md-4" onclick="linkEmployee()" style="background-image: url(../Content/Images/employees.jpg);">
+
+		<div class="textDivClass">
+			<h2>Employees</h2>
+		</div>
+
+	</div>
+</div>
+
+@section Scripts {
+	@Scripts.Render("~/bundles/jqueryval")
+	<script type="text/javascript">
+
+		function linkItem() {
+			window.location.href = "@Url.Action("Index", "LibraryItem")";
+	}
+
+	function linkCategory() {
+		window.location.href = "@Url.Action("Index", "Category")";
+	}
+
+	function linkEmployee() {
+		window.location.href = "@Url.Action("Index", "Employee")";
+	}
+
+	</script>
+	<style type="text/css">
+		.cardClass {
+			background-repeat: repeat;
+			background-size: 300px 100px;
+			height: 60vh;
+			cursor: pointer;
+			width: 18vw;
+			margin-right: 1vw;
+			width: 18vw;
+			margin-right: 1vw
+		}
+
+		.textDivClass {
+			background-color: blanchedalmond;
+			padding: 10px 30px 10px 10px;
+			margin-top: 15vh;
+			opacity: 0.8;
+			text-align: center;
+			border-radius: 10px;
+		}
+		body {
+			background-image: url(../Content/Images/marbel.jpg);
+		}
+		
+	</style>
+}

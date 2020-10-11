@@ -1,0 +1,133 @@
+﻿@model ConsidÖvning.Models.ViewModels.LibraryItemVM
+
+@{
+	ViewBag.Title = "CreateLibraryItem";
+}
+
+<h2>Create new library item</h2>
+
+
+@using (Html.BeginForm()) {
+	@Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+	<hr />
+	@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+	<div class="form-group">
+		@Html.LabelFor(model => model.Type, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.ValidationMessageFor(model => model.Type, "", new { @class = "text-danger" })
+			@Html.DropDownListFor(model => model.Type, (IEnumerable<SelectListItem>)ViewData["listItemsTypes"], new { id = "typeDDField", @class = "dropDownClass" })
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(model => model.Category, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.ValidationMessageFor(model => model.Category, "", new { @class = "text-danger" })
+			@Html.DropDownListFor(model => model.CategoryName, (IEnumerable<SelectListItem>)ViewData["listItemsCategory"], new { id = "categoryField", @class = "dropDownClass" })
+			<div id="addCategoryDiv" style="padding-top: 1vh; padding-left: .5vw;">
+				@Html.ActionLink("Add new category", "Create", "Category")
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		@Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+			@Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+		</div>
+	</div>
+
+	<div class="form-group">
+		@Html.LabelFor(model => model.Author, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.EditorFor(model => model.Author, new { htmlAttributes = new { @class = "form-control" } })
+			@Html.ValidationMessageFor(model => model.Author, "", new { @class = "text-danger" })
+		</div>
+	</div>
+
+	<div class="form-group" id="pagesDiv">
+		@Html.LabelFor(model => model.Pages, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.EditorFor(model => model.Pages, new { htmlAttributes = new { @class = "form-control", id = "pagesField" } })
+			@Html.ValidationMessageFor(model => model.Pages, "", new { @class = "text-danger" })
+		</div>
+	</div>
+
+	<div class="form-group" id="runTimeDiv">
+		@Html.LabelFor(model => model.RunTimeMinutes, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.EditorFor(model => model.RunTimeMinutes, new { htmlAttributes = new { @class = "form-control", id = "runTimeField" } })
+			@Html.ValidationMessageFor(model => model.RunTimeMinutes, "", new { @class = "text-danger" })
+		</div>
+	</div>
+
+
+
+	<div class="form-group">
+		<div class="col-md-offset-2 col-md-10">
+			<input type="submit" onclick="return validateValues()" value="Save item" class="btn btn-default" />
+		</div>
+	</div>
+</div>
+}
+
+<div>
+	@Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+	@Scripts.Render("~/bundles/jqueryval")
+	<script type="text/javascript">
+
+		window.onload = function () {
+			$('#runTimeDiv').hide();
+
+		}
+		$('#typeDDField').change(function () {
+			hideFieldsByType();
+		});
+
+		function hideFieldsByType() {
+			var type = $('#typeDDField').val();
+			if (type == 'Book' || type == 'Reference book') {
+				$('#runTimeDiv').hide();
+				$('#pagesDiv').show();
+			} else if (type == 'DVD' || type == 'Audio book') {
+				$('#runTimeDiv').show();
+				$('#pagesDiv').hide();
+			}
+		}
+
+		function validateValues() {
+			var type = $('#typeField').val();
+			var runTime = $('#runTimeField').val();
+			var pages = $('#pagesField').val();
+			var prevent = false;
+
+			if ((type == 'Book' || type == 'Reference book') && pages == "") {
+				alert('Item of type ' + type + " must have pages!");
+				prevent = true;
+			} else if ((type == 'DVD' || type == 'Audio book') && runTime == "") {
+				alert('Item of type ' + type + " must have run time!");
+				prevent = true;
+			}
+
+			if (prevent) {
+				return false;
+			} else {
+
+				return true;
+			}
+		}
+
+	</script>
+	<style type="text/css">
+		.dropDownClass {
+			width: 100%;
+			height: 4vh;
+			border-radius: 5px;
+		}
+	</style>
+}

@@ -1,0 +1,205 @@
+﻿@model ConsidÖvning.Models.ViewModels.LibraryItemVM
+
+@{
+	ViewBag.Title = "Edit";
+}
+
+<h2>Edit Item</h2>
+
+
+@using (Html.BeginForm()) {
+	@Html.AntiForgeryToken()
+
+	<div class="form-horizontal">
+		<hr />
+		@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+		@Html.HiddenFor(model => model.Id)
+		@Html.HiddenFor(Model => Model.IsBorrowable, new { id = "isBorrowableHidden" })
+		<div class="form-group">
+			@Html.LabelFor(model => model.Category, htmlAttributes: new { @class = "control-label col-md-2" })
+
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.Category.CategoryName, new { htmlAttributes = new { @class = "form-control", id = "categoryEditorField", @onclick = "categoryEditorFieldClick()" } })
+				@Html.ValidationMessageFor(model => model.Category.CategoryName, "", new { @class = "text-danger" })
+				@Html.DropDownListFor(model => model.CategoryName, (IEnumerable<SelectListItem>)ViewData["listItemsCategory"], new { id = "categoryDD", @class="dropDownClass" })
+				<div id="addCategoryDiv" style="padding-top: 1vh; padding-left: .5vw;">
+					@Html.ActionLink("Add new category", "Create", "Category")
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			@Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+				@Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group">
+			@Html.LabelFor(model => model.Author, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.Author, new { htmlAttributes = new { @class = "form-control" } })
+				@Html.ValidationMessageFor(model => model.Author, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group" id="pagesEditorField">
+			@Html.LabelFor(model => model.Pages, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.Pages, new { htmlAttributes = new { @class = "form-control", id = "pagesField" } })
+				@Html.ValidationMessageFor(model => model.Pages, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group" id="runTimeEditorField">
+			@Html.LabelFor(model => model.RunTimeMinutes, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.RunTimeMinutes, new { htmlAttributes = new { @class = "form-control", id= "runTimeField" } })
+
+				@Html.ValidationMessageFor(model => model.RunTimeMinutes, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group borrowClass">
+			@Html.LabelFor(model => model.Borrower, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.Borrower, new { htmlAttributes = new { @class = "form-control", id = "borrowerField" } })
+				@Html.ValidationMessageFor(model => model.Borrower, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group borrowClass">
+			@Html.LabelFor(model => model.BorrowDate, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.BorrowDate, new { htmlAttributes = new { @class = "form-control", id = "borrowDateField", @disabled = "disabled" } })
+				@Html.ValidationMessageFor(model => model.BorrowDate, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group">
+			@Html.LabelFor(model => model.Type, htmlAttributes: new { @class = "control-label col-md-2" })
+			<div class="col-md-10">
+				@Html.EditorFor(model => model.Type, new { htmlAttributes = new { @class = "form-control", id = "typeEditorField", @onclick = "typeEditorFieldClick()" } })
+				@Html.DropDownListFor(model => model.Type, (IEnumerable<SelectListItem>)ViewData["listItemsTypes"], new { id = "typeDD", @class = "dropDownClass" })
+				@Html.ValidationMessageFor(model => model.Type, "", new { @class = "text-danger" })
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-offset-2 col-md-10">
+				<input type="submit" onclick="return validateValues()" value="Save" class="btn btn-default" id="submitBtn" />
+				<input type="button" onclick="checkInItem()" value="Check in item" class="btn btn-default" id="checkInBtn" style="margin-left: 5vw; background-color: #e6ffe6;" />
+
+			</div>
+		</div>
+	</div>
+}
+
+<div>
+	@Html.ActionLink("See list of items", "Index")
+</div>
+
+@section Scripts {
+	@Scripts.Render("~/bundles/jqueryval")
+	<script type="text/javascript">
+		window.onload = function () {
+			$('#categoryDD').hide();
+			$('#typeDD').hide();
+			$('#addCategoryDiv').hide();
+
+			if (!$('#isBorrowableHidden').val()) {
+				$('.borrowClass').hide();
+			}
+			if ($('#borrowerField').val() == "") {
+				$('#checkInBtn').hide();
+			}
+			hideFieldsByType();
+		}
+
+		function categoryEditorFieldClick() {
+			$('#categoryDD').show();
+			$('#categoryEditorField').hide();
+			$('#addCategoryDiv').show();
+		}
+
+		function typeEditorFieldClick() {
+			$('#typeDD').show();
+			$('#typeEditorField').hide();
+		}
+
+		function hideFieldsByType() {
+			var type = $('#typeDD').val();
+			if (type == 'Book' || type == 'Reference book') {
+				$('#runTimeEditorField').hide();
+				$('#pagesEditorField').show();
+				if (type == 'Reference book') {
+					$('#isBorrowableHidden').val(false);
+					$('.borrowClass').hide();
+				} else {
+					$('#isBorrowableHidden').val(true);
+					$('.borrowClass').show();
+				}
+			} else if (type == 'DVD' || type == 'Audio book') {
+				$('#runTimeEditorField').show();
+				$('#pagesEditorField').hide();
+				$('#isBorrowableHidden').val(true);
+				$('.borrowClass').show();
+
+			}
+		}
+
+		function validateValues() {
+			$('#typeEditorField').val($('#typeDD').val());
+
+			var type = $('#typeEditorField').val();
+			var runTime = $('#runTimeField').val();
+			var pages = $('#pagesField').val();
+			var borrower = $('#borrowerField').val();
+			var borrowDate = $('#borrowDateField').val();
+			var prevent = false;
+
+			if ((type == 'Book' || type == 'Reference book') && pages == "") {
+				alert('Item of type ' + type + " must have pages!");
+				prevent = true;
+			} else if ((type == 'DVD' || type == 'Audio book') && runTime == "") {
+				alert('Item of type ' + type + " must have run time!");
+				prevent = true;
+			}
+
+			if (borrower != "" && borrowDate == "") {
+				$('#borrowDateField').val(new Date());
+			}
+
+			if (prevent) {
+				return false;
+			} else {
+
+				return true;
+			}
+			
+		}
+
+		function checkInItem() {
+			$('#borrowDateField').val(null);
+			$('#borrowerField').val(null);
+			$('#checkInBtn').hide();
+			$('#submitBtn').click();
+		};
+
+		$('#typeDD').change(function () {
+			hideFieldsByType();
+		});
+
+	</script>
+	<style type="text/css">
+		.dropDownClass {
+			width: 100%;
+			height: 4vh;
+			border-radius: 5px;
+		}
+
+		
+	</style>
+	
+}
